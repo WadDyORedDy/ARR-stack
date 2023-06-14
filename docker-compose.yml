@@ -1,0 +1,117 @@
+version: "3.3"
+services:
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID= #set to user ID
+      - PGID= #set to group ID
+      - TZ= #set to your timezone (fx. Europe/Berlin)
+    volumes:
+      - X:/config #X = your local location for config-data.
+      - /media:/media #this should ensure atomic moves.
+    ports:
+      - 7878:7878 #default
+    restart: unless-stopped
+
+  qbittorrent:
+    container_name: qbittorrent
+    image: cr.hotio.dev/hotio/qbittorrent
+    ports:
+      - "8090:8090" #webUI port
+      - "8118:8118" #TCP connection port
+    environment:
+      - PUID= #set to user ID
+      - PGID= #set to group ID
+      - UMASK=002 #override default umask settings, remember it subtracts from permissions, not add
+      - TZ= #set to your timezone (fx. Europe/Berlin)
+      - VPN_ENABLED=true
+      - VPN_LAN_NETWORK= #optional (fx. 192.168.0.0/16)
+      - VPN_CONF=wg0 #There needs to be a file called "wg0.conf" located in /config/wireguard and you need to set the variable VPN_ENABLED to true for the VPN to start.
+      - WEBUI_PORTS=8090/tcp,8090/udp
+      - VPN_ADDITIONAL_PORTS
+      - VPN_IP_CHECK_DELAY=5
+      - PRIVOXY_ENABLED=false
+    volumes:
+      - X:/config #X = your local location for config-data.
+      - /media/torrents:/media/torrents #custom directory, but should be placed within /media imo
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID= #set to user ID
+      - PGID= #set to group ID
+      - TZ= #set to your timezone (fx. Europe/Berlin)
+    volumes:
+      - X:/config #X = your local location for config-data.
+      - /media:/media #this should ensure atomic moves.
+    ports:
+      - 8989:8989 #webUI port
+    restart: unless-stopped
+
+  lidarr:
+    container_name: lidarr
+    image: cr.hotio.dev/hotio/lidarr
+    ports:
+      - 8686:8686 #webUI port
+    environment:
+      - PUID= #set to user ID
+      - PGID= #set to group ID
+      - UMASK=002 #override default umask settings, remember it subtracts from permissions, not add
+      - TZ= #set to your timezone (fx. Europe/Berlin)
+    volumes:
+      - X:/config #X = your local location for config-data.
+      - /media:/media #this should ensure atomic moves.
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID= #set to user ID
+      - PGID= #set to group ID
+      - TZ= #set to your timezone (fx. Europe/Berlin)
+      - AUTO_UPDATE=true #optional
+      - RUN_OPTS=<run options here> #optional
+    volumes:
+      - X:/config #X = your local location for config-data.
+    ports:
+      - 9117:9117 #webUI port
+    restart: unless-stopped
+
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID= #set to user ID
+      - PGID= #set to group ID
+      - VERSION=docker
+      - PLEX_CLAIM="" #Go to plex.tv/claim and login with your account, copy the claim code and add it to the environment variable. When starting the new plex server for the first time, the server will be added to your account.
+    volumes:
+      - /media/tv:/tv
+      - /media/movies:/movies
+      - X:/config #X = your local location for config-data.
+      - /tmp/plex:/transcode
+    restart: unless-stopped
+
+  bazarr:
+    container_name: bazarr
+    image: cr.hotio.dev/hotio/bazarr
+    ports:
+      - 6767:6767 #webUI port
+    environment:
+      - PUID= #set to user ID
+      - PGID= #set to group ID
+      - UMASK=002 #override default umask settings, remember it subtracts from permissions, not add
+      - TZ= #set to your timezone (fx. Europe/Berlin)
+    volumes:
+      - X:/config #X = your local location for config-data.
+      - /media:/media #this should ensure atomic moves.
+
+
