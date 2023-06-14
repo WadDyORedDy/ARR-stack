@@ -1,0 +1,7 @@
+Repositories used for docker-images:
+https://hotio.dev/containers/**APPLICATION** #check the website for the appropriate *arr-container
+https://hub.docker.com/u/linuxserver #used for some of the containers that was setup before I heard of hotio.dev
+
+
+Guides for ARR-stack:
+https://trash-guides.info/ #make sure to read it thoroughly - it is well-worth the time invested!
